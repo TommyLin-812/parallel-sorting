@@ -38,7 +38,9 @@ public class Main {
         System.out.println("文件中待排序数据个数为：" + len);
 
         //排序
-        SingleThreadMergeSort.merge_sort(arr);
+        //SingleThreadMergeSort.merge_sort(arr);
+        MultiThreadMergeSort.initArray(arr);
+        MultiThreadMergeSort.startSorting();
 
         //写文件
         dir = "DataOutput.txt";
