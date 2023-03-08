@@ -48,11 +48,8 @@ public class MultiThreadMergeSort extends Thread {
         System.out.println("Thread " + threadName + " exiting.");
     }
 
-    public static void startSorting() {
+    public static void startSorting(int threadNum) {
         int len = arr.length;
-        System.out.println("请输入线程数量：");
-        Scanner scanner = new Scanner(System.in);
-        int threadNum = scanner.nextInt();
         int[] start = new int[threadNum];
         int[] mid = new int[threadNum];
         int[] end = new int[threadNum];
