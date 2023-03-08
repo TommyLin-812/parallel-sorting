@@ -27,6 +27,7 @@ public class Main {
         }
 
         //读文件
+        System.out.println("正在读取随机数据...");
         String dir = "RandomData.txt";
         try {
             File file = new File(dir);
@@ -63,8 +64,11 @@ public class Main {
         System.out.printf("执行时长：%d 毫秒.\n", (costTime));
 
         //写文件
-        System.out.println("正在写入排序结果...");
-        saveSortedData("SortedData.txt");
+        System.out.println("是否保存排序结果？[y/n]");
+        if (Objects.equals(scanner.next(), "y")) {
+            System.out.println("正在写入排序结果...");
+            saveSortedData("SortedData.txt");
+        }
 
         //保存实验数据
         System.out.println("是否保存实验数据？[y/n]");

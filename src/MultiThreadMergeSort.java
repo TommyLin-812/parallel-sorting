@@ -51,7 +51,8 @@ public class MultiThreadMergeSort extends Thread {
 
     public static void startSorting(int threadNum) {
         //剩余区域检测标识，当初始线程数量为奇数时，第一轮归并排序会产生奇数个区域，导致之后始终剩余最后一个区域没有合并
-        boolean hasExtraDiv = threadNum % 2 == 1;
+        boolean hasExtraDiv;
+        hasExtraDiv = threadNum > 1 && threadNum % 2 == 1;
 
         //初始化
         int len = arr.length;
