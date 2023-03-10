@@ -7,5 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="tech.tablesaw.core" level="project" />
+    <orderEntry type="library" name="tech.tablesaw.jsplot" level="project" />
   </component>
 </module>

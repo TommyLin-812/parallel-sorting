@@ -1,3 +1,7 @@
+import tech.tablesaw.api.Table;
+import tech.tablesaw.plotly.Plot;
+import tech.tablesaw.plotly.api.AreaPlot;
+
 import java.io.*;
 import java.util.Objects;
 import java.util.Scanner;
@@ -62,8 +66,14 @@ public class Main {
         System.out.println("是否保存实验数据？[y/n]");
         if (Objects.equals(scanner.next(), "y")) {
             System.out.println("正在写入实验数据...");
-            saveTestData("TestData.txt", qty, threadNum, costTime);
+            saveTestData("TestData.csv", qty, threadNum, costTime);
         }
+
+        Table table = Table.read().csv("TestData.csv");
+        Plot.show(
+                AreaPlot.create(
+                        "Boston Robberies by month: Jan 1966-Oct 1975",
+                        table, "Record", "Robberies"));
     }
 
     private static void createRandomData(String dir, int qty, int min, int max) {
@@ -131,9 +141,16 @@ public class Main {
     private static void saveTestData(String dir, int qty, int threadNum, long costTime) {
         try {
             File file = new File(dir);
-            if (!file.exists()) file.createNewFile();
-            FileWriter fw = new FileWriter(file, true);
-            fw.write("" + qty + " " + threadNum + " " + costTime + "\n");
+            FileWriter fw;
+            if (!file.exists()) {
+                file.createNewFile();
+                fw = new FileWriter(file, true);
+                fw.write("qty,threadNum,costTime\n");
+                fw.flush();
+                fw.close();
+            }
+            fw = new FileWriter(file, true);
+            fw.write("" + qty + "," + threadNum + "," + costTime + "\n");
             fw.flush();
             fw.close();
         } catch (IOException e) {
