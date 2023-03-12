@@ -1,7 +1,3 @@
-import tech.tablesaw.api.Table;
-import tech.tablesaw.plotly.Plot;
-import tech.tablesaw.plotly.api.AreaPlot;
-
 import java.io.*;
 import java.util.Objects;
 import java.util.Scanner;
@@ -68,12 +64,6 @@ public class Main {
             System.out.println("正在写入实验数据...");
             saveTestData("TestData.csv", qty, threadNum, costTime);
         }
-
-        Table table = Table.read().csv("TestData.csv");
-        Plot.show(
-                AreaPlot.create(
-                        "Boston Robberies by month: Jan 1966-Oct 1975",
-                        table, "Record", "Robberies"));
     }
 
     private static void createRandomData(String dir, int qty, int min, int max) {
