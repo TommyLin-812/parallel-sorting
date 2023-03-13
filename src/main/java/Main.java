@@ -1,15 +1,13 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.*;
 import java.util.Objects;
-import java.util.Scanner;
 
 import static java.lang.Math.random;
 
 public class Main {
     private static int[] arr = new int[0];
-
-    private static int len = 0;
 
     private static int qty;
 
@@ -17,61 +15,6 @@ public class Main {
 
     public static void main(String[] args) {
         loadUI();
-
-        Scanner scanner = new Scanner(System.in);
-
-        boolean noCreated = true;
-        System.out.println("是否重新生成随机数？[y/n]");
-        if (Objects.equals(scanner.next(), "y")) {
-            System.out.println("请输入随机数据个数：");
-            qty = scanner.nextInt();
-
-            System.out.println("请输入随机数据最小值：");
-            int min = scanner.nextInt();
-
-            System.out.println("请输入随机数据最大值：");
-            int max = scanner.nextInt();
-
-            System.out.println("正在生成...");
-            createRandomData("RandomData.txt", qty, min, max);
-            len = qty;
-            noCreated = false;
-        }
-
-        if (noCreated) {
-            //读文件
-            System.out.println("正在读取随机数据...");
-            String dir = "RandomData.txt";
-            loadRandomData(dir);
-        }
-
-        System.out.println("请输入线程数量：");
-        int threadNum = scanner.nextInt();
-
-        long startTime = System.currentTimeMillis();
-        MultiThreadMergeSort.initArray(arr);
-        MultiThreadMergeSort.startSorting(threadNum);
-
-        long endTime = System.currentTimeMillis();
-        long costTime = endTime - startTime;
-        System.out.printf("执行时长：%d 毫秒.\n", (costTime));
-
-        //写文件
-        System.out.println("是否保存排序结果？[y/n]");
-        if (Objects.equals(scanner.next(), "y")) {
-            System.out.println("正在写入排序结果...");
-            saveSortedData("SortedData.txt");
-        }
-
-        //保存实验数据
-        System.out.println("是否保存实验数据？[y/n]");
-        if (Objects.equals(scanner.next(), "y")) {
-            System.out.println("正在写入实验数据...");
-            saveTestData("TestData-" + qty + ".csv", threadNum, costTime);
-        }
-
-        TestDataVisualizer.loadTestData("TestData-1000000.csv");
-        TestDataVisualizer.showAverageCostTime();
     }
 
     private static void createRandomData(String dir, int qty, int min, int max) {
@@ -99,16 +42,16 @@ public class Main {
 
     private static void loadRandomData(String dir) {
         try {
+            qty = 0;
             File file = new File(dir);
             if (!file.exists()) file.createNewFile();
             //创建BufferedReader读取文件内容
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
             while (br.readLine() != null) {
-                len++;
+                qty++;
             }
-            qty = len;
-            arr = new int[len];
+            arr = new int[qty];
             br = new BufferedReader(new FileReader(file));
             int i = 0;
             while ((line = br.readLine()) != null) {
@@ -118,7 +61,6 @@ public class Main {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        System.out.println("文件中待排序数据个数为：" + len);
     }
 
     private static void saveSortedData(String dir) {
@@ -158,7 +100,7 @@ public class Main {
 
     private static void loadUI() {
         frame = new JFrame("并行排序");
-        frame.setSize(500, 500);
+        frame.setSize(550, 300);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -171,44 +113,167 @@ public class Main {
         JLabel label_source_data = new JLabel("待排序数据文件：");
         c = new GridBagConstraints();
         gridBag.addLayoutComponent(label_source_data, c);
+        panel_main.add(label_source_data);
 
-        JTextField text_source_file = new JTextField(12);
+        JTextField text_source_file = new JTextField(16);
         c = new GridBagConstraints();
         gridBag.addLayoutComponent(text_source_file, c);
+        panel_main.add(text_source_file);
 
-        JButton btn_select_file = new JButton("浏览");
+        JButton btn_source_file = new JButton("浏览");
         c = new GridBagConstraints();
-        gridBag.addLayoutComponent(btn_select_file, c);
+        gridBag.addLayoutComponent(btn_source_file, c);
+        panel_main.add(btn_source_file);
 
         JButton btn_create_random = new JButton("生成");
         c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridBag.addLayoutComponent(btn_create_random, c);
+        panel_main.add(btn_create_random);
 
         JLabel label_thread_num = new JLabel("线程数量：");
         c = new GridBagConstraints();
-        c.anchor=GridBagConstraints.EAST;
+        c.anchor = GridBagConstraints.EAST;
         gridBag.addLayoutComponent(label_thread_num, c);
+        panel_main.add(label_thread_num);
 
         JTextField text_thread_num = new JTextField(4);
         c = new GridBagConstraints();
-        c.anchor=GridBagConstraints.WEST;
+        c.anchor = GridBagConstraints.WEST;
         gridBag.addLayoutComponent(text_thread_num, c);
+        panel_main.add(text_thread_num);
 
         JButton btn_execute_sort = new JButton("执行排序");
         c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridBag.addLayoutComponent(btn_execute_sort, c);
-
-        panel_main.add(label_source_data);
-        panel_main.add(text_source_file);
-        panel_main.add(btn_select_file);
-        panel_main.add(btn_create_random);
-        panel_main.add(label_thread_num);
-        panel_main.add(text_thread_num);
         panel_main.add(btn_execute_sort);
 
+        JLabel label_data_qty = new JLabel("文件中待排序数据个数：");
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        gridBag.addLayoutComponent(label_data_qty, c);
+        panel_main.add(label_data_qty);
+
+        JLabel label_test_result = new JLabel("实验结果：");
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.WEST;
+        gridBag.addLayoutComponent(label_test_result, c);
+        panel_main.add(label_test_result);
+
+        JButton btn_save_result = new JButton("保存排序结果");
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gridBag.addLayoutComponent(btn_save_result, c);
+        btn_save_result.setEnabled(false);
+        panel_main.add(btn_save_result);
+
+        btn_source_file.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File("."));
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setFileFilter(new FileNameExtensionFilter("txt文件(*.txt)", "txt"));
+
+            int result = fileChooser.showOpenDialog(frame);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                text_source_file.setText(file.getName());
+            }
+        });
+
+        btn_create_random.addActionListener(e -> {
+            qty = Integer.parseInt(JOptionPane.showInputDialog(frame, "输入随机数据个数：(0 ~ 2147483647)"));
+            createRandomData("RandomData.txt", qty, 0, 1000000);
+            text_source_file.setText("RandomData.txt");
+            label_data_qty.setText("文件中待排序数据个数：" + qty);
+        });
+
+        btn_execute_sort.addActionListener(e -> {
+            if (Objects.equals(text_source_file.getText(), "")) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "未选择待排序数据文件！",
+                        "错误",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            if (Objects.equals(text_thread_num.getText(), "")) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "未输入线程数量！",
+                        "错误",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            int threadNum = Integer.parseInt(text_thread_num.getText());
+            if (threadNum < 1) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "线程数量不得小于0！",
+                        "错误",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            btn_execute_sort.setEnabled(false);
+            loadRandomData(text_source_file.getText());
+            label_data_qty.setText("文件中待排序数据个数：" + qty);
+
+            long startTime = System.currentTimeMillis();
+            MultiThreadMergeSort.initArray(arr);
+            MultiThreadMergeSort.startSorting(threadNum);
+            long endTime = System.currentTimeMillis();
+            long costTime = endTime - startTime;
+
+            label_test_result.setText("实验结果：排序数据数量为" + qty + "个，线程数量为" + threadNum + "个，排序共耗时" + costTime + "毫秒。");
+
+            saveTestData("TestData-" + qty + ".csv", threadNum, costTime);
+
+            btn_execute_sort.setEnabled(true);
+
+            btn_save_result.setEnabled(true);
+        });
+
+        btn_save_result.addActionListener(e -> saveSortedData("SortedData.txt"));
+
         tabbedPane.addTab("测试", panel_main);
+
+        JPanel panel_visualize = new JPanel(new FlowLayout());
+        JLabel label_test_data = new JLabel("实验数据文件：");
+        panel_visualize.add(label_test_data);
+        JTextField text_test_data = new JTextField(16);
+        panel_visualize.add(text_test_data);
+        JButton btn_test_data = new JButton("浏览");
+        panel_visualize.add(btn_test_data);
+        JButton btn_visualize = new JButton("显示折线图");
+        panel_visualize.add(btn_visualize);
+
+        btn_test_data.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File("."));
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setFileFilter(new FileNameExtensionFilter("CSV文件(*.csv)", "csv"));
+
+            int result = fileChooser.showOpenDialog(frame);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                text_test_data.setText(file.getName());
+            }
+        });
+
+        btn_visualize.addActionListener(e -> {
+            TestDataVisualizer.loadTestData(text_test_data.getText());
+            TestDataVisualizer.showAverageCostTime();
+        });
+
+        tabbedPane.addTab("数据可视化", panel_visualize);
 
         tabbedPane.setSelectedIndex(0);
 

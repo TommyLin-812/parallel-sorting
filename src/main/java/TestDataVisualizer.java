@@ -8,10 +8,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.mean;
 public class TestDataVisualizer {
     private static Table testDataSet;
 
-    private static Table result;
-
     public static void loadTestData(String dir) {
-        System.out.println("正在加载实验数据...");
         CsvReadOptions.Builder builder =
                 CsvReadOptions.builder(dir)
                         .separator(',')
@@ -19,13 +16,11 @@ public class TestDataVisualizer {
         CsvReadOptions options = builder.build();
         testDataSet = Table.read().usingOptions(options);
         testDataSet.setName(dir);
-        System.out.println("实验结果文件中数据条数为：" + testDataSet.rowCount());
     }
 
     public static void showAverageCostTime() {
-        result = testDataSet.summarize("costTime", mean).by("threadNum");
+        Table result = testDataSet.summarize("costTime", mean).by("threadNum").sortAscendingOn("threadNum");
         result.setName("AverageCostTime by ThreadNum");
-        System.out.println(result.print());
 
         Plot.show(
                 LinePlot.create(testDataSet.name(), result, "threadNum", "Mean [costTime]")

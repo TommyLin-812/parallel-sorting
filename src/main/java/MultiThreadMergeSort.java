@@ -22,7 +22,8 @@ public class MultiThreadMergeSort extends Thread {
         this.mid = mid;
         this.end = end;
         this.flag = flag;
-        System.out.println("Creating " + threadName);
+
+        //System.out.println("Creating " + threadName);
     }
 
     public static void initArray(int[] arr) {
@@ -31,7 +32,8 @@ public class MultiThreadMergeSort extends Thread {
     }
 
     public void start() {
-        System.out.println("Starting " + threadName);
+        //System.out.println("Starting " + threadName);
+
         if (t == null) {
             t = new Thread(this, threadName);
             t.start();
@@ -45,7 +47,8 @@ public class MultiThreadMergeSort extends Thread {
         else
             SingleThreadMergeSort.merge(arr, result, start, mid, end);
 
-        System.out.println("Thread " + threadName + " exiting.");
+        //System.out.println("Thread " + threadName + " exiting.");
+
         s[Integer.parseInt(threadName)].release();  //释放信号量
     }
 
