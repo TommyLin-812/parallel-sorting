@@ -1,7 +1,5 @@
-import tech.tablesaw.api.Table;
-import tech.tablesaw.plotly.Plot;
-import tech.tablesaw.plotly.api.AreaPlot;
-
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.util.Objects;
 import java.util.Scanner;
@@ -15,7 +13,11 @@ public class Main {
 
     private static int qty;
 
+    private static JFrame frame;
+
     public static void main(String[] args) {
+        loadUI();
+
         Scanner scanner = new Scanner(System.in);
 
         boolean noCreated = true;
@@ -47,7 +49,6 @@ public class Main {
         int threadNum = scanner.nextInt();
 
         long startTime = System.currentTimeMillis();
-        //SingleThreadMergeSort.merge_sort(arr);
         MultiThreadMergeSort.initArray(arr);
         MultiThreadMergeSort.startSorting(threadNum);
 
@@ -66,14 +67,11 @@ public class Main {
         System.out.println("是否保存实验数据？[y/n]");
         if (Objects.equals(scanner.next(), "y")) {
             System.out.println("正在写入实验数据...");
-            saveTestData("TestData.csv", qty, threadNum, costTime);
+            saveTestData("TestData-" + qty + ".csv", threadNum, costTime);
         }
 
-        Table table = Table.read().csv("TestData.csv");
-        Plot.show(
-                AreaPlot.create(
-                        "Test",
-                        table, "qty", "costTime"));
+        TestDataVisualizer.loadTestData("TestData-1000000.csv");
+        TestDataVisualizer.showAverageCostTime();
     }
 
     private static void createRandomData(String dir, int qty, int min, int max) {
@@ -138,23 +136,83 @@ public class Main {
         }
     }
 
-    private static void saveTestData(String dir, int qty, int threadNum, long costTime) {
+    private static void saveTestData(String dir, int threadNum, long costTime) {
         try {
             File file = new File(dir);
             FileWriter fw;
             if (!file.exists()) {
                 file.createNewFile();
                 fw = new FileWriter(file, true);
-                fw.write("qty,threadNum,costTime\n");
+                fw.write("threadNum,costTime\n");
                 fw.flush();
                 fw.close();
             }
             fw = new FileWriter(file, true);
-            fw.write("" + qty + "," + threadNum + "," + costTime + "\n");
+            fw.write("" + threadNum + "," + costTime + "\n");
             fw.flush();
             fw.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private static void loadUI() {
+        frame = new JFrame("并行排序");
+        frame.setSize(500, 500);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        GridBagLayout gridBag = new GridBagLayout();
+        JPanel panel_main = new JPanel(gridBag);
+        GridBagConstraints c;
+
+        JLabel label_source_data = new JLabel("待排序数据文件：");
+        c = new GridBagConstraints();
+        gridBag.addLayoutComponent(label_source_data, c);
+
+        JTextField text_source_file = new JTextField(12);
+        c = new GridBagConstraints();
+        gridBag.addLayoutComponent(text_source_file, c);
+
+        JButton btn_select_file = new JButton("浏览");
+        c = new GridBagConstraints();
+        gridBag.addLayoutComponent(btn_select_file, c);
+
+        JButton btn_create_random = new JButton("生成");
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gridBag.addLayoutComponent(btn_create_random, c);
+
+        JLabel label_thread_num = new JLabel("线程数量：");
+        c = new GridBagConstraints();
+        c.anchor=GridBagConstraints.EAST;
+        gridBag.addLayoutComponent(label_thread_num, c);
+
+        JTextField text_thread_num = new JTextField(4);
+        c = new GridBagConstraints();
+        c.anchor=GridBagConstraints.WEST;
+        gridBag.addLayoutComponent(text_thread_num, c);
+
+        JButton btn_execute_sort = new JButton("执行排序");
+        c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gridBag.addLayoutComponent(btn_execute_sort, c);
+
+        panel_main.add(label_source_data);
+        panel_main.add(text_source_file);
+        panel_main.add(btn_select_file);
+        panel_main.add(btn_create_random);
+        panel_main.add(label_thread_num);
+        panel_main.add(text_thread_num);
+        panel_main.add(btn_execute_sort);
+
+        tabbedPane.addTab("测试", panel_main);
+
+        tabbedPane.setSelectedIndex(0);
+
+        frame.setContentPane(tabbedPane);
+        frame.setVisible(true);
     }
 }

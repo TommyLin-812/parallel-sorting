@@ -5,16 +5,16 @@ public class MultiThreadMergeSort extends Thread {
 
     private final String threadName;
 
-    private static int[] arr;   //目标数组
+    private static int[] arr;       //目标数组
     private static int[] result;    //辅助数组
 
     private static Semaphore[] s;   //信号量数组
 
-    private final int start;    //区域左边界
-    private final int mid;  //区域中心
-    private final int end;  //区域右边界
+    private final int start;        //区域左边界
+    private final int mid;          //区域中心
+    private final int end;          //区域右边界
 
-    private final boolean flag; //线程操作标识
+    private final boolean flag;     //线程操作标识
 
     public MultiThreadMergeSort(String threadName, int start, int mid, int end, boolean flag) {
         this.threadName = threadName;
@@ -93,7 +93,7 @@ public class MultiThreadMergeSort extends Thread {
             //等待所有信号量，即等待所有线程结束
             for (int i = 0; i < threadNum; i++) {
                 try {
-                    s[i].acquire();//获取信号量
+                    s[i].acquire(); //获取信号量
                 } catch (InterruptedException e) {
                     System.out.println(e.getMessage());
                 }
