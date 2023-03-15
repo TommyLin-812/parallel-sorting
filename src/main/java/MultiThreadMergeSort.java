@@ -1,9 +1,9 @@
 import java.util.concurrent.Semaphore;
 
 public class MultiThreadMergeSort extends Thread {
-    private Thread t;
+    private Thread t;   //线程
 
-    private final String threadName;
+    private final String threadName;    //线程名称（序号）
 
     private static int[] arr;       //目标数组
     private static int[] result;    //辅助数组
@@ -16,6 +16,15 @@ public class MultiThreadMergeSort extends Thread {
 
     private final boolean flag;     //线程操作标识
 
+    /**
+     * 构造函数
+     *
+     * @param threadName 线程的名称
+     * @param start      区域左边界
+     * @param mid        区域中心
+     * @param end        区域右边界
+     * @param flag       线程操作标识
+     */
     public MultiThreadMergeSort(String threadName, int start, int mid, int end, boolean flag) {
         this.threadName = threadName;
         this.start = start;
@@ -26,6 +35,11 @@ public class MultiThreadMergeSort extends Thread {
         //System.out.println("Creating " + threadName);
     }
 
+    /**
+     * 选择要操作的数组，并初始化辅助数组
+     *
+     * @param arr 目标数组
+     */
     public static void initArray(int[] arr) {
         MultiThreadMergeSort.arr = arr;
         result = new int[arr.length];
@@ -52,6 +66,11 @@ public class MultiThreadMergeSort extends Thread {
         s[Integer.parseInt(threadName)].release();  //释放信号量
     }
 
+    /**
+     * 根据线程数量执行排序
+     *
+     * @param threadNum 线程数量
+     */
     public static void startSorting(int threadNum) {
         //剩余区域检测标识，当初始线程数量为奇数时，第一轮归并排序会产生奇数个区域，导致之后始终剩余最后一个区域没有合并
         boolean hasExtraDiv;
@@ -103,6 +122,8 @@ public class MultiThreadMergeSort extends Thread {
             }
 
             threadNum /= 2; //计算下一循环所需线程数
+
+            //若无剩余区域，且线程数量为0，结束操作
             if (!hasExtraDiv && threadNum == 0) return;
 
             flag = false;   //标记非第一次运行，后续线程进行合并操作
@@ -113,14 +134,17 @@ public class MultiThreadMergeSort extends Thread {
                 end[i] = end[i * 2 + 1];
                 mid[i] = end[i * 2];
             }
+            //若有剩余区域，需要包括进去
             if (hasExtraDiv) {
                 start[threadNum] = start[threadNum * 2];
                 end[threadNum] = end[threadNum * 2];
                 mid[threadNum] = mid[threadNum * 2];
-            }
-            if (hasExtraDiv && threadNum == 0) {
-                threadNum++;
-                hasExtraDiv = false;
+
+                //若线程数为0，即此时存在2个区域，需再执行一次
+                if (threadNum == 0) {
+                    threadNum++;
+                    hasExtraDiv = false;
+                }
             }
         }
     }
