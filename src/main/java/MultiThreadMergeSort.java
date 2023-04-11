@@ -72,10 +72,6 @@ public class MultiThreadMergeSort extends Thread {
      * @param threadNum 线程数量
      */
     public static void startSorting(int threadNum) {
-        //剩余区域检测标识，当初始线程数量为奇数时，第一轮归并排序会产生奇数个区域，导致之后始终剩余最后一个区域没有合并
-        boolean hasExtraDiv;
-        hasExtraDiv = threadNum > 1 && (threadNum % 2 == 1 || (threadNum / 2) % 2 == 1);
-
         //初始化
         int len = arr.length;
         int[] start = new int[threadNum];
@@ -99,7 +95,7 @@ public class MultiThreadMergeSort extends Thread {
         }
 
         boolean flag = true;    //标记第一次运行，线程要执行完整归并排序
-        while (threadNum > 0) {
+        while (true) {
             MultiThreadMergeSort[] t = new MultiThreadMergeSort[threadNum]; //根据线程数量创建线程数组
             s = new Semaphore[threadNum];   //根据线程数量创建信号量数组
             for (int i = 0; i < threadNum; i++) {
@@ -121,38 +117,7 @@ public class MultiThreadMergeSort extends Thread {
                 }
             }
 
-            int newThreadNum = threadNum / 2; //计算下一循环所需线程数
-
-            //若无剩余区域，且线程数量为0，结束操作
-            if (!hasExtraDiv && newThreadNum == 0) return;
-
-            flag = false;   //标记非第一次运行，后续线程进行合并操作
-
-            //再次划分区域
-            for (int i = 0; i < newThreadNum; i++) {
-                start[i] = start[i * 2];
-                mid[i] = end[i * 2];
-                end[i] = end[i * 2 + 1];
-            }
-
-            //若有剩余区域，需要包括进去
-            if (hasExtraDiv && threadNum % 2 == 1) {
-                if (newThreadNum == 0) {
-                    mid[0] = end[0];
-                    end[0] = end[1];
-                } else {
-                    start[newThreadNum] = start[newThreadNum * 2];
-                    end[newThreadNum] = end[newThreadNum * 2];
-                    mid[newThreadNum] = mid[newThreadNum * 2];
-                }
-
-                //若线程数为0，即此时存在2个区域，需再执行一次
-                if (newThreadNum == 0) {
-                    newThreadNum++;
-                    hasExtraDiv = false;
-                }
-            }
-            threadNum = newThreadNum;
+            //TODO 任务分配逻辑
         }
     }
 }
