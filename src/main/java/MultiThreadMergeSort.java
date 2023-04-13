@@ -72,6 +72,9 @@ public class MultiThreadMergeSort extends Thread {
      * @param threadNum 线程数量
      */
     public static void startSorting(int threadNum) {
+        boolean hasExtraDiv = false;
+        int extraDivIndex = 0;
+
         //初始化
         int len = arr.length;
         int[] start = new int[threadNum];
@@ -117,7 +120,56 @@ public class MultiThreadMergeSort extends Thread {
                 }
             }
 
+            flag=false;
+
             //TODO 任务分配逻辑
+            if (threadNum == 1 && !hasExtraDiv) break;
+            else if (threadNum == 1 && hasExtraDiv) {
+                mid[0] = end[0];
+                end[0] = end[extraDivIndex];
+                hasExtraDiv = false;
+            } else if (threadNum > 1 && !hasExtraDiv) {
+                int newThreadNum = threadNum / 2;
+                for (int i = 0; i < newThreadNum; i++) {
+                    start[i] = start[i * 2];
+                    mid[i] = end[i * 2];
+                    end[i] = end[i * 2 + 1];
+                }
+                if (threadNum % 2 == 1) {
+                    hasExtraDiv = true;
+                    extraDivIndex=threadNum-1;
+                }
+                threadNum = newThreadNum;
+            } else if (threadNum > 1 && hasExtraDiv) {
+                int newThreadNum = threadNum / 2;
+                if (threadNum % 2 == 1) {
+
+                    for (int i = 0; i < newThreadNum; i++) {
+                        start[i] = start[i * 2];
+                        mid[i] = end[i * 2];
+                        end[i] = end[i * 2 + 1];
+                    }
+                    start[newThreadNum]=start[newThreadNum*2];
+                    mid[newThreadNum]=end[newThreadNum*2];
+                    end[newThreadNum]=end[extraDivIndex];
+                    hasExtraDiv = false;
+                    newThreadNum += 1;
+                } else {
+                    for (int i = 0; i < newThreadNum; i++) {
+                        start[i] = start[i * 2];
+                        mid[i] = end[i * 2];
+                        end[i] = end[i * 2 + 1];
+                    }
+                }
+                threadNum = newThreadNum;
+            }
+        }
+
+        for (int i=0;i<arr.length-1;i++){
+            if (arr[i]>arr[i+1]){
+                System.out.println("排序错误");
+                break;
+            }
         }
     }
 }
