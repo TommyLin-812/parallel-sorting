@@ -72,8 +72,8 @@ public class MultiThreadMergeSort extends Thread {
      * @param threadNum 线程数量
      */
     public static void startSorting(int threadNum) {
-        boolean hasExtraDiv = false;
-        int extraDivIndex = 0;
+        boolean hasExtraDiv = false;    //标识是否有由于奇数个线程产生的剩余区域
+        int extraDivIndex = 0;  //记录剩余区域的索引
 
         //初始化
         int len = arr.length;
@@ -120,53 +120,46 @@ public class MultiThreadMergeSort extends Thread {
                 }
             }
 
-            flag=false;
+            flag = false;   //第一轮操作之后都执行合并操作
 
-            //TODO 任务分配逻辑
-            if (threadNum == 1 && !hasExtraDiv) break;
-            else if (threadNum == 1 && hasExtraDiv) {
+            if (threadNum == 1 && !hasExtraDiv) break;  //线程数量为1且运行结束时没有剩余区域，则退出循环
+            else if (threadNum == 1 && hasExtraDiv) {   //线程数量为1，有剩余区域，此时需要多执行一次
                 mid[0] = end[0];
                 end[0] = end[extraDivIndex];
                 hasExtraDiv = false;
-            } else if (threadNum > 1 && !hasExtraDiv) {
+            } else if (threadNum > 1 && !hasExtraDiv) { //线程大于1且没有剩余区域
+                int newThreadNum = threadNum / 2;
+                for (int i = 0; i < newThreadNum; i++) {    //分配区域
+                    start[i] = start[i * 2];
+                    mid[i] = end[i * 2];
+                    end[i] = end[i * 2 + 1];
+                }
+                if (threadNum % 2 == 1) {   //若线程数量为奇数，会产生剩余区域，需要记录
+                    hasExtraDiv = true;
+                    extraDivIndex = threadNum - 1;
+                }
+                threadNum = newThreadNum;
+            } else if (threadNum > 1 && hasExtraDiv) {  //线程数量大于1，且有剩余区域
                 int newThreadNum = threadNum / 2;
                 for (int i = 0; i < newThreadNum; i++) {
                     start[i] = start[i * 2];
                     mid[i] = end[i * 2];
                     end[i] = end[i * 2 + 1];
                 }
-                if (threadNum % 2 == 1) {
-                    hasExtraDiv = true;
-                    extraDivIndex=threadNum-1;
-                }
-                threadNum = newThreadNum;
-            } else if (threadNum > 1 && hasExtraDiv) {
-                int newThreadNum = threadNum / 2;
-                if (threadNum % 2 == 1) {
-
-                    for (int i = 0; i < newThreadNum; i++) {
-                        start[i] = start[i * 2];
-                        mid[i] = end[i * 2];
-                        end[i] = end[i * 2 + 1];
-                    }
-                    start[newThreadNum]=start[newThreadNum*2];
-                    mid[newThreadNum]=end[newThreadNum*2];
-                    end[newThreadNum]=end[extraDivIndex];
+                if (threadNum % 2 == 1) {   //若线程数量为奇数，可以将剩余区域包括进分配过程，去除剩余区域
+                    start[newThreadNum] = start[newThreadNum * 2];
+                    mid[newThreadNum] = end[newThreadNum * 2];
+                    end[newThreadNum] = end[extraDivIndex];
                     hasExtraDiv = false;
                     newThreadNum += 1;
-                } else {
-                    for (int i = 0; i < newThreadNum; i++) {
-                        start[i] = start[i * 2];
-                        mid[i] = end[i * 2];
-                        end[i] = end[i * 2 + 1];
-                    }
                 }
                 threadNum = newThreadNum;
             }
         }
 
-        for (int i=0;i<arr.length-1;i++){
-            if (arr[i]>arr[i+1]){
+        //检验排序正确性
+        for (int i = 0; i < arr.length - 1; i++) {
+            if (arr[i] > arr[i + 1]) {
                 System.out.println("排序错误");
                 break;
             }
